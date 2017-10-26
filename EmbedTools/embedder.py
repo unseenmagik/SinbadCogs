@@ -9,12 +9,13 @@ class Embedder:
     """
     make embeds that can be called later
     """
+    __author__ = "mikeshardmind"
+    __version__ = "1.0.0"
 
     def __init__(self, bot):
         self.bot = bot
         self.config = Config.get_conf(
             self, identifier=2081794460, force_registration=True)
-        self.config.register_channel(embeds={})
         self.config.register_guild(embeds={})
         self.config.register_global(embeds={})
 
@@ -41,6 +42,32 @@ class Embedder:
             return
         embeds = await self.config.embeds()
         embeds.update({name: em})
+
+        await self.config.embeds.set(embeds)
+
+    @commands.command()
+    async def fetchglobal(self, ctx, *, name: str):
+        """
+        fetch a global embed
+        """
+        embeds = await self.config.embeds()
+        if name not in embeds:
+            return await ctx.send("That embed doesn't exist")
+        em = embeds[name]
+        try:
+            await self.send_embed(ctx, em)
+        except RuntimeError as e:
+            await ctx.send(e)
+
+    async def send_embed(self, ctx, em):
+        timestamp = datetime.strptime(em['timestamp'], '%Y-%m-%d %H:%M')
+        em = discord.Embed(description=em['content'], timestamp=timestamp)
+        if em['title'] is not None:
+            em.set_author(name=em['title'])
+        try:
+            await ctx.send(embed=em)
+        except Exception:
+            raise RuntimeError("I'm missing a required permission.")
 
     async def interactive_embed(self, ctx):
         author = ctx.author
