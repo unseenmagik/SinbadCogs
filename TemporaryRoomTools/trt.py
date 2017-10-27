@@ -66,12 +66,47 @@ class RoomTools:
         if cat is None:
             return await ctx.send('This guild does not have a '
                                   'temporary channels category')
-        x = await ctx.guild.create_text_channel(f'{name}')
+        x = await ctx.guild.create_text_channel(name,
+                                                (ctx.guild.default_role,
+                                                 self.everyone_perms),
+                                                (ctx.author, self.owner_perms),
+                                                (ctx.guild.me,
+                                                 self.joined_perms))
+
         await asyncio.sleep(0.5)
         await x.edit(category=cat)
-        await x.set_permissions(ctx.author,
-                                manage_channels=True, manage_roles=True)
         await self.config.channel(x).is_temp.set(True)
+        await x.send(
+            f"""Hi {ctx.author.mention}, I've created your channel here.
+            People can join by using the following command.\n
+            `{ctx.prefix}jointxt {x.id}`
+            """
+        )
+
+    @commands.command(pass_context=True, no_pm=True, name="jointxt")
+    async def _join_text(self, ctx, chan_id: int):
+        """try to join a room"""
+        author = ctx.author
+        try:
+            await self.bot.delete_message(ctx.message)
+        except Exception:
+            pass
+        c = discord.utils.get(self.bot.get_all_channels(), id=chan_id)
+        if c is None:
+            return await ctx.send("That isn't a joinable channel")
+        is_temp = await self.config.channel(c).is_temp()
+        if not is_temp:
+            return await ctx.send("That isn't a joinable channel")
+
+        try:
+            await c.set_permissions(author, self.joined_perms)
+        except Exception as e:
+            await ctx.send("Something unexpected went wrong. Good luck.")
+        else:
+            await ctx.send(f"Click this. It's a channel link, "
+                           f"not a hashtag."
+                           f"\nIf it isn't clickable, it isn't for you. "
+                           f"{c.mention}")
 
     async def on_voice_state_update(self, member, v_before, v_after):
         if v_before.channel == v_after.channel:
