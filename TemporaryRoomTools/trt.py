@@ -17,6 +17,7 @@ class RoomTools:
     `⌛` or `🎮` , the second of which will attempt to name the channel
     by the game being played (according to discord's status)
     """
+
     def __init__(self, bot):
         self.bot = bot
         self.everyone_perms = discord.PermissionOverwrite(read_messages=False)
@@ -91,7 +92,8 @@ class RoomTools:
             """
         )
 
-    @commands.command(pass_context=True, no_pm=True, name="jointxt")
+    @commands.guild_only()
+    @commands.command(name="jointxt")
     async def _join_text(self, ctx, chan_id: int):
         """try to join a room"""
         author = ctx.author

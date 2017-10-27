@@ -14,20 +14,22 @@ class QuoteTools:
         self.bot = bot
 
     @commands.command()
-    async def quote(self, ctx, message_id: int):
+    async def quote(self, ctx, *message_ids: int):
         """
-        quote a message by ID
+        quote a message by ID(s)
         """
-        try:
-            msg = await self.find_message(message_id)
-        except discord.NotFound:
-            ctx.send("Couldn't find that one.")
-        else:
+        for message_id in message_ids:
             try:
-                em = self.quote_from_message(msg)
-                ctx.send(embed=em)
-            except Exception:
-                ctx.send("I don't have permission to do that")
+                msg = await self.find_message(message_id, ctx.channel)
+            except discord.NotFound:
+                if len(message_ids) == 1:
+                    await ctx.send("Couldn't find that one.")
+            else:
+                try:
+                    em = self.quote_from_message(msg)
+                    await ctx.send(embed=em)
+                except Exception:
+                    return await ctx.send("I don't have permission to do that")
 
     async def find_message(self, message_id: int,
                            chan: Union[int, discord.TextChannel]=None):
@@ -40,21 +42,34 @@ class QuoteTools:
 
         if channel:
             try:
-                msg = channel.get_message(message_id)
+                msg = await channel.get_message(message_id)
             except Exception:
-                raise
+                guild = channel.guild
             else:
                 return msg
-        else:
-            for channel in self.bot.get_all_channels:
+
+        if guild:
+            for channel in guild.text_channels:
                 try:
-                    msg = channel.get_message(message_id)
+                    msg = await channel.get_message(message_id)
+                except Exception:
+                    guilds = [g for g in self.bot.guilds if g != guild]
+                else:
+                    return msg
+
+        if not guilds:
+            guilds = self.bot.guilds
+
+        for guild in guilds:
+            for channel in guild.text_channels:
+                try:
+                    msg = await channel.get_message(message_id)
                 except Exception:
                     pass
                 else:
                     return msg
-            else:
-                raise discord.NotFound
+        else:
+            raise discord.NotFound
 
     def quote_from_message(message: discord.Message):
         channel = message.channel
