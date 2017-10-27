@@ -8,6 +8,14 @@ from redbot.core import Config
 class RoomTools:
     """
     cog for managing various temporary channel types
+
+    custom temporary text/voice channels can be enabled by creating a category
+    named "Temporary Channels"
+
+    Alternatively, you can create automatically cloned upon entering channels:
+    To make one either have the channel name start with
+    `⌛` or `🎮` , the second of which will attempt to name the channel
+    by the game being played (according to discord's status)
     """
     def __init__(self, bot):
         self.bot = bot
