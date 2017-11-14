@@ -1,9 +1,8 @@
 language: python
 python:
-  - "3.5.2"
   - "3.6.2"
 install:
-  - pip install -r requirements.txt
+  - pip install -U --process-dependency-links -r requirements.txt
 script:
   - python -m compileall .
 cache: pip
