@@ -1,7 +1,0 @@
-{
-    "AUTHOR" : "mikeshardmind",
-    "INSTALL_MSG" : "Use at own risk. Unload to disable",
-    "NAME" : "PermBreaker",
-    "SHORT" : "Bypass checks on existing commands",
-    "DESCRIPTION" : "Allows bypassing of checks for specific users on a command by comand basis."
-}
