@@ -9,9 +9,9 @@ def setup(bot):
         global roomtoolscmdgroup
         bot.add_cog(RoomTools(bot))
         roomtoolscmdgroup = bot.get_cog('RoomTools').roomtoolsgroup
-        if bot.get_cog('RoomTools').ar_active:
+        if True:  # bot.get_cog('RoomTools').ar_active:
             bot.add_cog(AutoRooms(bot))
-        if bot.get_cog('RoomTools').tmpc_active:
+        if False:  # bot.get_cog('RoomTools').tmpc_active:
             bot.add_cog(TempChannels(bot))
     else:
         raise RuntimeError("This package requires python version >= 3.6.2")
