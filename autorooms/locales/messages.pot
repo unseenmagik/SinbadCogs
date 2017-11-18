@@ -55,7 +55,7 @@ msgid ""
 "\n"
 "For more details on how to set this up, use {}help AutoRooms\n"
 "\n"
-"If this is acceptable, reissue the command.This warning will not be shown "
+"If this is acceptable, reissue the command. This warning will not be shown "
 "again"
 msgstr ""
 

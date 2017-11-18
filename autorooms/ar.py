@@ -50,7 +50,7 @@ class AutoRooms:
                   'and with the same permissions as their origin.'
                   '\n\nFor more details on how to set this up, use '
                   '{}help AutoRooms'
-                  '\n\nIf this is acceptable, reissue the command.'
+                  '\n\nIf this is acceptable, reissue the command. '
                   'This warning will not be shown again').format(ctx.prefix))
             await self.config.guild(ctx.guild).read_instructions.set(True)
             return
