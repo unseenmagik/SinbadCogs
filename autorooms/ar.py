@@ -9,7 +9,14 @@ _ = CogI18n("AutoRooms", __file__)
 
 
 class AutoRooms:
-    # I'd put a help doc here, but this class should never be directly exposed
+    """
+    Temporary voice channel cog with minimal configuration required
+
+    Designate Autorooms by naming a channel starting with
+    '⌛' for a standard autoroom
+    or
+    '🎮' for a room based on game detection
+    """
 
     def __init__(self, bot):
         self.bot = bot
@@ -23,13 +30,15 @@ class AutoRooms:
         self.config.register_guild(is_active=False)
         self.config.register_channel(is_temp=False)
 
+    @commands.command(name='autoroomtoggle')
     @commands.guild_only()
     @commands.bot_has_permissions(manage_channels=True)
     @checks.admin_or_permissions(manage_channels=True)
-    @commands.command(
-        name='autoroomtoggle', parent=roomtoolcmdgroup)  # noqa: F821
     async def aatoggle(self, ctx):
-        help_doc = _("Toggle autoroom status for the guild")  # noqa: F841
+        """
+        toggle autoroom status for the guild
+        """
+
         has_read = await self.config.guild(ctx.guild).read_instructions()
         if not has_read:
             await ctx.send(
