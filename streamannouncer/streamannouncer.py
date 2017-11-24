@@ -1,5 +1,4 @@
 import os
-import aiohttp
 import discord
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
@@ -7,21 +6,13 @@ from cogs.utils import checks
 from discord.utils import find
 
 
-class StreamAnnouncerError(Exception):
-    pass
-
-
-class NoSuchStream(StreamAnnouncerError):
-    pass
-
-
-class BadToken(StreamAnnouncerError):
-    pass
-
-
 class StreamAnnouncer:
 
-    """Configureable stream announcements"""
+    """
+    Configureable stream announcements
+    Depends on Red's builtin stream cog being loaded
+    and having a twitch token set
+    """
     __version__ = "2.0.0"
     __author__ = "mikeshardmind (Sinbad#0413)"
 
@@ -131,9 +122,8 @@ class StreamAnnouncer:
 
         game_list = server_settings.get("game_list", [])
         if len(game_list) > 0:
-            try:
-                data = await self.twitch_data(stream_url.split('/')[-1])
-            except StreamAnnouncerError:
+            data = await self.twitch_data(stream_url.split('/')[-1])
+            if data is None:
                 return
             if data['stream']['game'] not in game_list:
                 return
@@ -151,25 +141,13 @@ class StreamAnnouncer:
         self.save_json()
 
     async def twitch_data(self, stream):
-        token = self.bot.get_cog('Streams').settings.get('TWITCH_TOKEN', "")
-        session = aiohttp.ClientSession()
-        url = "https://api.twitch.tv/kraken/streams/" + stream
-        header = {
-            'Client-ID': token,
-            'Accept': 'application/vnd.twitchtv.v5+json'
-        }
-
-        async with session.get(url, headers=header) as r:
-            data = await r.json(encoding='utf-8')
-        await session.close()
-        if r.status == 200:
+        stream_cog = self.bot.get_cog('Streams')
+        if stream_cog:
+            try:
+                data = await stream_cog.twitch_online(stream)
+            except Exception:
+                data = None
             return data
-        elif r.status == 400:
-            raise BadToken()
-        elif r.status == 404:
-            raise NoSuchStream()
-        else:
-            raise StreamAnnouncerError("API issue")
 
 
 def check_folder():
