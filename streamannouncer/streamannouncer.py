@@ -1,4 +1,5 @@
 import os
+import aiohttp
 import discord
 from discord.ext import commands
 from cogs.utils.dataIO import dataIO
@@ -6,10 +7,22 @@ from cogs.utils import checks
 from discord.utils import find
 
 
+class StreamAnnouncerError(Exception):
+    pass
+
+
+class NoSuchStream(StreamAnnouncerError):
+    pass
+
+
+class BadToken(StreamAnnouncerError):
+    pass
+
+
 class StreamAnnouncer:
 
     """Configureable stream announcements"""
-    __version__ = "1.0.0"
+    __version__ = "2.0.0"
     __author__ = "mikeshardmind (Sinbad#0413)"
 
     def __init__(self, bot):
@@ -65,17 +78,40 @@ class StreamAnnouncer:
             self.save_json()
             await self.bot.say("Role required to be announced set")
 
+    async def cleanup(self, msgs: dict, _id, channel: discord.Channel):
+        message_id = msgs.get(_id, None)
+        if message_id is None:
+            return
+        message = await self.bot.get_message(channel, message_id)
+        if message:
+            try:
+                await self.bot.delete_message(message)
+            except Exception:
+                pass
+
     async def on_stream(self, memb_before,  memb_after):
-        if memb_after.game is None:
-            return
-        if memb_after.game.type != 1:
-            return
         if memb_before.server.id not in self.settings:
             self.settings[memb_before.server.id] = {"output": None,
                                                     "role_id": None}
             self.save_json()
-
         server_settings = self.settings[memb_before.server.id]
+        if 'msgs' not in server_settings:
+            server_settings['msgs'] = {}
+            self.save_json()
+
+        output = find(lambda m: m.id == server_settings["output"],
+                      memb_after.server.channels)
+        if output is None:
+            return
+
+        if memb_after.game is None:
+            await self.cleanup(server_settings['msgs'], memb_after.id, output)
+            return
+
+        if memb_after.game.type != 1:
+            await self.cleanup(server_settings['msgs'], memb_after.id, output)
+            return
+
         if server_settings["output"] is None \
                 or server_settings["role_id"] is None:
             return
@@ -93,9 +129,47 @@ class StreamAnnouncer:
 
         stream_url = memb_after.game.url
 
-        msg = "{} just started streaming: {}".format(memb_after.mention,
-                                                     stream_url)
-        await self.bot.send_message(dest, msg)
+        game_list = server_settings.get("game_list", [])
+        if len(game_list) > 0:
+            try:
+                data = await self.twitch_data(stream_url.split('/')[-1])
+            except StreamAnnouncerError:
+                return
+            if data['stream']['game'] not in game_list:
+                return
+
+        stream_cog = self.bot.get_cog('Streams')
+        if stream_cog:
+            embed = stream_cog.twitch_embed(data)
+            message_object = await self.bot.send_message(dest, embed=embed)
+        else:
+            msg = "{} just started streaming: {}".format(
+                memb_after.mention, stream_url)
+            message_object = await self.bot.send_message(dest, msg)
+
+        server_settings['msgs'][memb_before.id] = message_object.id
+        self.save_json()
+
+    async def twitch_data(self, stream):
+        token = self.bot.get_cog('Streams').settings.get('TWITCH_TOKEN', "")
+        session = aiohttp.ClientSession()
+        url = "https://api.twitch.tv/kraken/streams/" + stream
+        header = {
+            'Client-ID': token,
+            'Accept': 'application/vnd.twitchtv.v5+json'
+        }
+
+        async with session.get(url, headers=header) as r:
+            data = await r.json(encoding='utf-8')
+        await session.close()
+        if r.status == 200:
+            return data
+        elif r.status == 400:
+            raise BadToken()
+        elif r.status == 404:
+            raise NoSuchStream()
+        else:
+            raise StreamAnnouncerError("API issue")
 
 
 def check_folder():
