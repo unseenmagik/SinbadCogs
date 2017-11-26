@@ -8,15 +8,10 @@ from redbot.core.i18n import CogI18n
 _ = CogI18n("AutoRooms", __file__)
 
 
-class AutoRooms:
-    """
-    Temporary voice channel cog with minimal configuration required
+aatoggle_help = _("toggle autoroom status for the guild")
 
-    Designate Autorooms by naming a channel starting with
-    '⌛' for a standard autoroom
-    or
-    '🎮' for a room based on game detection
-    """
+
+class AutoRooms:
 
     def __init__(self, bot):
         self.bot = bot
@@ -30,14 +25,11 @@ class AutoRooms:
         self.config.register_guild(is_active=False)
         self.config.register_channel(is_temp=False)
 
-    @commands.command(name='autoroomtoggle')
+    @commands.command(name='autoroomtoggle', help=aatoggle_help)
     @commands.guild_only()
     @commands.bot_has_permissions(manage_channels=True)
     @checks.admin_or_permissions(manage_channels=True)
     async def aatoggle(self, ctx):
-        """
-        toggle autoroom status for the guild
-        """
 
         has_read = await self.config.guild(ctx.guild).read_instructions()
         if not has_read:

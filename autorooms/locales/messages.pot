@@ -1,10 +1,17 @@
-
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
 #, fuzzy
 msgid ""
 msgstr ""
-"POT-Creation-Date: 2017-11-14 10:50-0500\n"
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2017-11-26 11:30-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -14,38 +21,23 @@ msgstr ""
 msgid "AutoRooms"
 msgstr ""
 
-#: ar.py:12
-msgid ""
-"\n"
-"    Temporary voice channel cog with minimal configuration required\n"
-"\n"
-"    Designate Autorooms by naming a channel starting with\n"
-"    '⌛' for a standard autoroom\n"
-"    or\n"
-"    '🎮' for a room based on game detection\n"
-"    "
+#: ar.py:11
+msgid "toggle autoroom status for the guild"
 msgstr ""
 
-#: ar.py:25
+#: ar.py:20
 msgid "⌛"
 msgstr ""
 
-#: ar.py:26
+#: ar.py:21
 msgid "🎮"
 msgstr ""
 
-#: ar.py:33
+#: ar.py:28
 msgid "autoroomtoggle"
 msgstr ""
 
-#: ar.py:38
-msgid ""
-"\n"
-"        toggle autoroom status for the guild\n"
-"        "
-msgstr ""
-
-#: ar.py:45
+#: ar.py:37
 msgid ""
 "Warning: This cog allows users to create temporary voice channels without "
 "requiring additional permissions.\n"
@@ -59,36 +51,36 @@ msgid ""
 "again"
 msgstr ""
 
-#: ar.py:63
+#: ar.py:55
 msgid "Autorooms have been disabled."
 msgstr ""
 
-#: ar.py:65
+#: ar.py:57
 msgid "Autorooms have been enabled."
 msgstr ""
 
-#: ar.py:95 ar.py:113
+#: ar.py:87 ar.py:105
 msgid "bitrate"
 msgstr ""
 
-#: ar.py:95 ar.py:113
+#: ar.py:87 ar.py:105
 msgid "user_limit"
 msgstr ""
 
-#: ar.py:100
+#: ar.py:92
 #, python-brace-format
 msgid "{member.display_name}'s room"
 msgstr ""
 
-#: ar.py:107 ar.py:129
+#: ar.py:99 ar.py:121
 msgid "autoroom"
 msgstr ""
 
-#: ar.py:119
+#: ar.py:111
 #, python-brace-format
 msgid "{member.display_name} Has no game"
 msgstr ""
 
-#: ar.py:121
+#: ar.py:113
 msgid "{member.game.name}"
 msgstr ""
