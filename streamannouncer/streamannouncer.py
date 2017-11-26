@@ -166,8 +166,13 @@ def check_file():
 
 
 def setup(bot):
-    check_folder()
-    check_file()
-    n = StreamAnnouncer(bot)
-    bot.add_listener(n.on_stream, "on_member_update")
-    bot.add_cog(n)
+    stream_cog = bot.get_cog('Streams')
+    if stream_cog is None:
+        raise RuntimeError(
+            'This cog relies on Red\'s built stream cog. Please load it first')
+    else:
+        check_folder()
+        check_file()
+        n = StreamAnnouncer(bot)
+        bot.add_listener(n.on_stream, "on_member_update")
+        bot.add_cog(n)
